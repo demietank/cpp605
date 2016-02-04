@@ -19,6 +19,10 @@ Triangle::Triangle(const unsigned int sideA, const unsigned int sideB, const uns
    assert(sideA > 0);
    assert(sideB > 0);
    assert(sideC > 0);
+
+   assert(sideA + sideB > sideC);
+   assert(sideA + sideC > sideB);
+   assert(sideB + sideC > sideA);
 }
 
 bool Triangle::isEquilateral() const

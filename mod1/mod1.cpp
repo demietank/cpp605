@@ -22,22 +22,25 @@ int main()
    // load the sled with triangles of known qualities
 
    // invalid - should cause assert if included
-   //testSled.addTriangle(Triangle(0, 1, 1));
-   //testSled.addTriangle(Triangle(1, 0, 1));
-   //testSled.addTriangle(Triangle(1, 1, 0));
+   //testSled.addTriangle(Triangle(0, 1, 1), false, false, true);
+   //testSled.addTriangle(Triangle(1, 0, 1), false, false, true);
+   //testSled.addTriangle(Triangle(1, 1, 0), false, false, true);
+   //testSled.addTriangle(Triangle(1, 2, 20), false, false, true);
+   //testSled.addTriangle(Triangle(2, 20, 1), false, false, true);
+   //testSled.addTriangle(Triangle(20, 1, 2), false, false, true);
 
    // equilateral, isosceles
    testSled.addTriangle(Triangle(1, 1, 1), true, true, false);
    testSled.addTriangle(Triangle(3, 3, 3), true, true, false);
 
    // isosceles
-   testSled.addTriangle(Triangle(1, 1, 2), false, true, false);
-   testSled.addTriangle(Triangle(1, 2, 1), false, true, false);
-   testSled.addTriangle(Triangle(2, 1, 1), false, true, false);
+   testSled.addTriangle(Triangle(5, 5, 6), false, true, false);
+   testSled.addTriangle(Triangle(5, 6, 5), false, true, false);
+   testSled.addTriangle(Triangle(6, 5, 5), false, true, false);
 
    // scalene
-   testSled.addTriangle(Triangle(1, 2, 3), false, false, true);
-   testSled.addTriangle(Triangle(2, 5, 7), false, false, true);
+   testSled.addTriangle(Triangle(3, 4, 5), false, false, true);
+   testSled.addTriangle(Triangle(2, 4, 3), false, false, true);
 
    success = testSled.runTest();
    if (success)
