@@ -6,14 +6,13 @@
  */
 
 #include <cassert>
-#include <climits>
 #include <iostream>
+#include <cmath>
+#include <numeric>
 
 #include "Statistics.h"
 
-Statistics::Statistics() :
-      mTotal(0),
-      mNumElements(0)
+Statistics::Statistics()
 {
 }
 
@@ -23,43 +22,39 @@ Statistics::~Statistics()
 
 bool Statistics::addNumber(int num)
 {
-   bool status;
-
-   if ((mTotal > 0) && (num > (INT_MAX - mTotal)))
+   try
    {
-      std::cerr << "Operation would cause overflow, rejected" << std::endl;
-      status = false;
+      mSequence.emplace_back(num);
+      return true;
    }
-   else if ((mTotal < 0) && (num < (INT_MIN - mTotal)))
+   catch (std::bad_alloc& ba)
    {
-      std::cerr << "Operation would cause underflow, rejected" << std::endl;
-      status = false;
+     std::cerr << "Failed to add " << num << "; bad_alloc caught: " << ba.what() << std::endl;
+     return false;
    }
-   else if (mNumElements == UINT_MAX)
-   {
-      std::cerr << "The pattern is full, rejected" << std::endl;
-      status = false;
-   }
-   else
-   {
-      mTotal += num;
-      mNumElements++;
-      status = true;
-   }
-
-   return status;
 }
 
 double Statistics::getAverage() const
 {
-   assert(mNumElements != 0);
-   return static_cast<double>(mTotal) / mNumElements;
+   assert(!mSequence.empty());
+   long long sum = 0; //force the return type to be long long
+
+   sum = std::accumulate(mSequence.begin(), mSequence.end(), sum);
+   return static_cast<double>(sum) / mSequence.size();
 }
 
 double Statistics::getStdDev() const
 {
-   assert(mNumElements != 0);
+   assert(!mSequence.empty());
 
-   return 0;
+   const double avg = getAverage();
+   double sumDeviaton = 0.0;
+
+   for (const auto& i : mSequence)
+   {
+      sumDeviaton += pow((i - avg), 2);
+   }
+
+   return sqrt(sumDeviaton / mSequence.size());
 }
 

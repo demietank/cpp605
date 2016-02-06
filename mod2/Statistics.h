@@ -8,8 +8,11 @@
 #ifndef STATISTICS_H_
 #define STATISTICS_H_
 
+#include <vector>
+
 /**
- * @brief
+ * @brief A class that contains a variable number of integers and calculates statistics on the sequence.
+ * @note This class is not thread safe.
  */
 class Statistics
 {
@@ -20,7 +23,7 @@ public:
    Statistics();
 
    /**
-    * @brief Destructors the sequence.
+    * @brief Destructs the sequence.
     */
    ~Statistics();
 
@@ -45,15 +48,9 @@ public:
 
 private:
    /**
-    * @brief Summation of the elements in the sequence.
+    * @brief Container of numbers in this statistics sequence.
     */
-   int mTotal;
-
-   /**
-    * @Brief Number of elements in the sequence.
-    */
-   unsigned int mNumElements;
-
+   std::vector<int> mSequence;
 };
 
 #endif /* STATISTICS_H_ */
