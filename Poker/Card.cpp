@@ -50,43 +50,43 @@ std::ostream& operator<<(std::ostream& out,
    switch (rank)
    {
    case Rank::TWO:
-      s = "2";
+      s = " 2";
       break;
    case Rank::THREE:
-      s = "3";
+      s = " 3";
       break;
    case Rank::FOUR:
-      s = "4";
+      s = " 4";
       break;
    case Rank::FIVE:
-      s = "5";
+      s = " 5";
       break;
    case Rank::SIX:
-      s = "6";
+      s = " 6";
       break;
    case Rank::SEVEN:
-      s = "7";
+      s = " 7";
       break;
    case Rank::EIGHT:
-      s = "8";
+      s = " 8";
       break;
    case Rank::NINE:
-      s = "9";
+      s = " 9";
       break;
    case Rank::TEN:
       s = "10";
       break;
    case Rank::JACK:
-      s = "J";
+      s = " J";
       break;
    case Rank::QUEEN:
-      s = "Q";
+      s = " Q";
       break;
    case Rank::KING:
-      s = "K";
+      s = " K";
       break;
    case Rank::ACE:
-      s = "A";
+      s = " A";
       break;
    default:
       s = "";

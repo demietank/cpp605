@@ -60,8 +60,15 @@ public:
       return mSuit;
    }
 
-   /// Used to order a hand of cards by rank.
-   static bool sortCards(const Card& card1, const Card& card2) { return card1.getRank() > card2.getRank(); };
+   /// Determines the equality of two cards.
+   bool operator==(const Card& other) const
+   {
+      return (mRank == other.mRank) && (mSuit == other.mSuit);
+   };
+
+   /// Cards are compared by rank. Suit does not factor into relative ordering.
+   bool operator<(const Card& other) const { return mRank < other.mRank; };
+   bool operator>(const Card& other) const { return mRank > other.mRank; };
 
 private:
    /// Outputs an ASCII representation of the card.

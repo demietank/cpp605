@@ -5,19 +5,29 @@
  *      Author: Chris
  */
 
+#include <algorithm>
+
 #include "PokerGame.h"
 
 namespace PokerGame
 {
 
-void PokerGame::addHand(const Hand& hand)
+/// Create a poker game between two players.
+PokerGame::PokerGame(const Hand& hand1, const Hand& hand2) :
+      mHasWinner(false),
+      mWinner(hand1),
+      mLoser(hand2)
 {
-   mHands.emplace_back(hand);
-}
-
-void PokerGame::reset()
-{
-   mHands.clear();
+   // determine the winning hand
+   auto outcome = mWinner.getWinner(mLoser);
+   if (outcome != HandComparrison::TIES)
+   {
+      mHasWinner = true;
+      if (outcome == HandComparrison::LOSES)
+      {
+         std::swap(mWinner, mLoser);
+      }
+   }
 }
 
 std::ostream& operator<<(std::ostream& out,
@@ -26,10 +36,18 @@ std::ostream& operator<<(std::ostream& out,
    constexpr const char * GAME_BORDER = "---------------";
 
    out << GAME_BORDER << std::endl;
-   for (const auto& hand : game.mHands)
+   out << game.mWinner << std::endl;
+
+   if (game.hasWinner())
    {
-      out << hand << std::endl;
+      out << "Defeats" << std::endl;
    }
+   else
+   {
+      out << "Ties" << std::endl;
+   }
+
+   out << game.mLoser << std::endl;
    out << GAME_BORDER << std::endl;
 
    return out;
