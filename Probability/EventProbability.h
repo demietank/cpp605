@@ -54,7 +54,6 @@ EventProbability operator-(const EventProbability& lhs,
 /// Returns the likelihood of A (lhs) not occurring.
 EventProbability operator~(const EventProbability& lhs);
 
-
 /// Determines the equality of two EventProbability, accounting for minute deltas.
 /// True if the doubles can be considered equal.
 bool operator==(const EventProbability& lhs, const EventProbability& rhs);

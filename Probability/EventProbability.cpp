@@ -29,43 +29,34 @@ EventProbability::EventProbability(const double probability) :
 EventProbability operator&(const EventProbability& lhs,
                  const EventProbability& rhs)
 {
-   // AB
+   // P(A and B) = P(A) * P(B)
    return lhs.getProbability() * rhs.getProbability();
 }
 
 EventProbability operator|(const EventProbability& lhs,
                  const EventProbability& rhs)
 {
-   // P(A and B) = P(A) · P(B)
-   auto raw = lhs.getProbability() + rhs.getProbability();
-   return raw;
-   // Ensure bounds
-   //return EventProbability(raw).getProbability();
+   // P(A or B) = P(A) + P(B) - P(A and B)
+   return lhs.getProbability() + rhs.getProbability() - (lhs & rhs).getProbability();
 }
 
 EventProbability operator^(const EventProbability& lhs,
                  const EventProbability& rhs)
 {
-   // (A + B) - AB
-   auto raw = EventProbability(lhs | rhs).getProbability()
-         - EventProbability(lhs & rhs).getProbability();
-   return raw;
-   // Ensure bounds
-   //return EventProbability(raw).getProbability();
+   // P(A or B) - P(A and B)
+   return (lhs | rhs).getProbability() - (lhs & rhs).getProbability();
 }
 
 EventProbability operator-(const EventProbability& lhs,
                  const EventProbability& rhs)
 {
-   // A - AB
-   auto raw = lhs.getProbability() - EventProbability(lhs & rhs).getProbability();
-   return raw;
-   // Ensure bounds
-   //return EventProbability(raw).getProbability();
+   // P(A and not B) = P(A) - P(A and B)
+   return lhs.getProbability() - (lhs & rhs).getProbability();
 }
 
 EventProbability operator~(const EventProbability& lhs)
 {
+   // P(not A) = 1 - P(A)
    return PROBABILITY_MAX - lhs.getProbability();
 }
 
@@ -85,3 +76,4 @@ bool operator==(const EventProbability& lhs,
 }
 
 } /* namespace probability */
+
