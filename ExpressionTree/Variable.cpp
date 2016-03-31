@@ -9,14 +9,22 @@
 
 namespace expressions
 {
-Variable::Variable(std::string&& name) :
-   mName(std::move(name))
+
+Variable::Variable(const std::string& name, const VarMap& varMap) :
+      mName(name),
+      mVarMap(varMap)
+{
+}
+
+Variable::Variable(std::string&& name, const VarMap& varMap) :
+   mName(std::move(name)),
+   mVarMap(varMap)
 {
 }
 
 double Variable::evaluate() const
 {
-   return 0;
+   return mVarMap.at(mName);
 }
 
 void Variable::print(std::ostream& out) const

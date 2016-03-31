@@ -10,14 +10,14 @@
 namespace expressions
 {
 
-Expression::Expression(std::unique_ptr<Node> left,
-                       std::unique_ptr<Node> right) :
+Expression::Expression(Node_ptr left,
+                       Node_ptr right) :
       mLeft(std::move(left)),
       mRight(std::move(right))
 {
 }
 
-Add::Add(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+Add::Add(Node_ptr left, Node_ptr right) :
       Expression(std::move(left), std::move(right))
 {
 }
@@ -32,7 +32,7 @@ void Add::print(std::ostream& out) const
    out << "(" << *mLeft << " + " << *mRight << ")";
 }
 
-Sub::Sub(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+Sub::Sub(Node_ptr left, Node_ptr right) :
       Expression(std::move(left), std::move(right))
 {
 }
@@ -47,7 +47,7 @@ void Sub::print(std::ostream& out) const
    out << "(" << *mLeft << " - " << *mRight << ")";
 }
 
-Mul::Mul(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+Mul::Mul(Node_ptr left, Node_ptr right) :
       Expression(std::move(left), std::move(right))
 {
 }
@@ -62,7 +62,7 @@ void Mul::print(std::ostream& out) const
    out << "(" << *mLeft << " * " << *mRight << ")";
 }
 
-Div::Div(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+Div::Div(Node_ptr left, Node_ptr right) :
       Expression(std::move(left), std::move(right))
 {
 }
