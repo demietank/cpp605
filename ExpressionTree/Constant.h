@@ -19,6 +19,9 @@ public:
    /// Constructs a node that holds a constant value.
    Constant(const double value);
 
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
+
    /// Returns the value held within the node.
    double evaluate() const;
 

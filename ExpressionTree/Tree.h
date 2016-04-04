@@ -8,8 +8,6 @@
 #ifndef TREE_H_
 #define TREE_H_
 
-#include <memory>
-
 #include "Constant.h"
 #include "Expression.h"
 #include "Node.h"
@@ -26,9 +24,16 @@ public:
    /// Constructs the top of the tree based on a single root node, transferring ownership.
    Tree(Node_ptr node);
 
+   /// Copy assignment and constructor
+   Tree(const Tree& other);
+   Tree& operator=(const Tree& other) = default;
+
    /// Move assignment and constructor
    Tree(Tree&&) = default;
    Tree& operator=(Tree&&) = default;
+
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
 
    /// @copydoc Node::evaluate
    double evaluate() const;

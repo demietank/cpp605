@@ -47,7 +47,7 @@ bool ExpressionTest::test()
    vMap[Y] = 3;
    vMap[Z] = 5;
 
-   // print and evaluate project specific tree #1
+   // print and evaluate project tree #1
    Tree t1 {
       make_unique<Add>(
             make_unique<Mul>(make_unique<Constant>(2.3), make_unique<Variable>(X, vMap)),
@@ -62,6 +62,20 @@ bool ExpressionTest::test()
    catch (...)
    {
       std::cerr << "exception caught evaluating t1" << std::endl;
+      ret = false;
+   }
+
+   //print and evaluate the derivative of tree #1
+   Tree dt = t1;
+   std::cout << std::endl << dt << std::endl;
+   try
+   {
+      const auto dtVal = dt.evaluate();
+      std::cout << "dt evaluates to: " << dtVal << std::endl;
+   }
+   catch (...)
+   {
+      std::cerr << "exception caught evaluating dt" << std::endl;
       ret = false;
    }
 

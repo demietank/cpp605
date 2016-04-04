@@ -11,8 +11,18 @@ namespace expressions
 {
 
 Tree::Tree(Node_ptr node) :
-         mNode(std::move(node))
+      mNode(std::move(node))
 {
+}
+
+Tree::Tree(const Tree& other) :
+      mNode(std::move(other.mNode->clone()))
+{
+}
+
+Node_ptr Tree::clone() const
+{
+   return make_unique<Tree>(mNode->clone());
 }
 
 double Tree::evaluate() const

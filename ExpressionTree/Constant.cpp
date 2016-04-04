@@ -15,6 +15,11 @@ Constant::Constant(const double value) :
 {
 }
 
+Node_ptr Constant::clone() const
+{
+   return make_unique<Constant>(mValue);
+}
+
 double Constant::evaluate() const
 {
    return mValue;

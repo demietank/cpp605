@@ -8,27 +8,10 @@
 #ifndef EXPRESSION_H_
 #define EXPRESSION_H_
 
-#include <memory>
-
 #include "Node.h"
 
 namespace expressions
 {
-
-
-#if __cplusplus > 201103L
-using std::make_unique;
-#else
-/// Create and return a unique pointer using the specified type's new operator.
-template< class T, class... Args >
-std::unique_ptr<T> make_unique( Args&&... args )
-{
-   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-#endif
-
-/// Used for convenience
-using Node_ptr = std::unique_ptr<Node>;
 
 /// Represents an expression node of an expression tree. This is the base class for a node
 /// that holds two leaves. The expression's value is determined by the leaves' values and the
@@ -65,6 +48,9 @@ public:
    Add(Add&&) = default;
    Add& operator=(Add&&) = default;
 
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
+
    /// Returns the value of the left leaf added with the right leaf.
    double evaluate() const;
 
@@ -82,6 +68,9 @@ public:
    /// Move assignment and constructor
    Sub(Sub&&) = default;
    Sub& operator=(Sub&&) = default;
+
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
 
    /// Returns the value of the right leaf subtracted from the left leaf.
    double evaluate() const;
@@ -101,6 +90,9 @@ public:
    Mul(Mul&&) = default;
    Mul& operator=(Mul&&) = default;
 
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
+
    /// Returns the value of the left leaf multiplied with the right leaf.
    double evaluate() const;
 
@@ -118,6 +110,9 @@ public:
    /// Move assignment and constructor
    Div(Div&&) = default;
    Div& operator=(Div&&) = default;
+
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
 
    /// Returns the value of the left leaf divided by the right leaf.
    double evaluate() const;

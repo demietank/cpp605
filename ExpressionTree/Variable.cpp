@@ -22,6 +22,11 @@ Variable::Variable(std::string&& name, const VarMap& varMap) :
 {
 }
 
+Node_ptr Variable::clone() const
+{
+   return make_unique<Variable>(mName, mVarMap);
+}
+
 double Variable::evaluate() const
 {
    return mVarMap.at(mName);

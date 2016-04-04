@@ -28,6 +28,9 @@ public:
    Variable(const std::string& name, const VarMap& varMap);
    Variable(std::string&& name, const VarMap& varMap);
 
+   /// @copydoc Node::clone
+   Node_ptr clone() const;
+
    /// Returns the value of the variable as held in mVarMap. Exception thrown if not in map.
    double evaluate() const;
 
