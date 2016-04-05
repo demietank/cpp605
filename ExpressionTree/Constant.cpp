@@ -20,6 +20,12 @@ Node_ptr Constant::clone() const
    return make_unique<Constant>(mValue);
 }
 
+Node_ptr Constant::derivative(const std::string& dVarName) const
+{
+   (void)dVarName;
+   return make_unique<Constant>(0.0);
+}
+
 double Constant::evaluate() const
 {
    return mValue;

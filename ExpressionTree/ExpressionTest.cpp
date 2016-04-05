@@ -66,7 +66,7 @@ bool ExpressionTest::test()
    }
 
    //print and evaluate the derivative of tree #1
-   Tree dt = t1;
+   Tree dt = t1.derivative("X");
    std::cout << std::endl << dt << std::endl;
    try
    {

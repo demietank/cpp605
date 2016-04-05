@@ -9,7 +9,6 @@
 #define VARIABLE_H_
 
 #include <map>
-#include <string>
 
 #include "Node.h"
 
@@ -30,6 +29,11 @@ public:
 
    /// @copydoc Node::clone
    Node_ptr clone() const;
+
+   /// Returns a smart pointer to the derivative of this variable.
+   /// This variable: 1.0
+   /// Other variable: 0.0
+   Node_ptr derivative(const std::string& dVarName) const;
 
    /// Returns the value of the variable as held in mVarMap. Exception thrown if not in map.
    double evaluate() const;

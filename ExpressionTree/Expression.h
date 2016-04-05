@@ -48,6 +48,11 @@ public:
    Add(Add&&) = default;
    Add& operator=(Add&&) = default;
 
+   /// @copydoc Node::derivative
+   /// d = left node; du = derivative of left node; v = right node; dv = derivative of right node.
+   /// du + dv
+   Node_ptr derivative(const std::string& dVarName) const;
+
    /// @copydoc Node::clone
    Node_ptr clone() const;
 
@@ -72,6 +77,11 @@ public:
    /// @copydoc Node::clone
    Node_ptr clone() const;
 
+   /// @copydoc Node::derivative
+   /// d = left node; du = derivative of left node; v = right node; dv = derivative of right node.
+   /// du - dv
+   Node_ptr derivative(const std::string& dVarName) const;
+
    /// Returns the value of the right leaf subtracted from the left leaf.
    double evaluate() const;
 
@@ -93,6 +103,11 @@ public:
    /// @copydoc Node::clone
    Node_ptr clone() const;
 
+   /// @copydoc Node::derivative
+   /// d = left node; du = derivative of left node; v = right node; dv = derivative of right node.
+   /// u*dv + v*du
+   Node_ptr derivative(const std::string& dVarName) const;
+
    /// Returns the value of the left leaf multiplied with the right leaf.
    double evaluate() const;
 
@@ -113,6 +128,11 @@ public:
 
    /// @copydoc Node::clone
    Node_ptr clone() const;
+
+   /// @copydoc Node::derivative
+   /// d = left node; du = derivative of left node; v = right node; dv = derivative of right node.
+   /// (v*du - u*dv) / (v*v)
+   Node_ptr derivative(const std::string& dVarName) const;
 
    /// Returns the value of the left leaf divided by the right leaf.
    double evaluate() const;

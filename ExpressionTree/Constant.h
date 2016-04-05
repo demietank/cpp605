@@ -22,6 +22,9 @@ public:
    /// @copydoc Node::clone
    Node_ptr clone() const;
 
+   /// Returns a smart pointer to the derivative of this constant (0.0).
+   Node_ptr derivative(const std::string& dVarName) const;
+
    /// Returns the value held within the node.
    double evaluate() const;
 

@@ -25,6 +25,11 @@ Node_ptr Tree::clone() const
    return make_unique<Tree>(mNode->clone());
 }
 
+Node_ptr Tree::derivative(const std::string& dVarName) const
+{
+   return mNode->derivative(dVarName);
+}
+
 double Tree::evaluate() const
 {
    return mNode->evaluate();

@@ -35,6 +35,9 @@ public:
    /// @copydoc Node::clone
    Node_ptr clone() const;
 
+   /// @copydoc Node::derivative
+   Node_ptr derivative(const std::string& dVarName) const;
+
    /// @copydoc Node::evaluate
    double evaluate() const;
 

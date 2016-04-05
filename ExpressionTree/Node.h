@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <ostream>
+#include <string>
 
 namespace expressions
 {
@@ -38,6 +39,9 @@ public:
 
    /// Returns a smart pointer to a clone (deeply copied) of this node.
    virtual Node_ptr clone() const = 0;
+
+   /// Returns a smart pointer to a derivative of this node with respect to the specified variable.
+   virtual Node_ptr derivative(const std::string& dVarName) const = 0;
 
    /// Returns the value of the node, or the aggregate of child nodes.
    virtual double evaluate() const = 0;
