@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 #include <cassert>
@@ -52,7 +54,6 @@ bool ElevatorSim::readPassengerCsv()
       std::string line;
       while (std::getline(file, line))
       {
-         std::cout << line << std::endl;
          bool lineStatus = true;
          int startTime = 0;
          FloorNumber startFloor = 0;
@@ -61,42 +62,50 @@ bool ElevatorSim::readPassengerCsv()
          // get the tokens
          std::stringstream lineStream(line);
          std::string cell;
-         if (std::getline(lineStream, cell, ','))
+         try
          {
-            startTime = atoi(cell.c_str());
-         }
-         else
-         {
-            lineStatus = false;
-         }
+            if (std::getline(lineStream, cell, ','))
+            {
+               startTime = std::stoi(cell, nullptr);
+            }
+            else
+            {
+               lineStatus = false;
+            }
 
-         if (std::getline(lineStream, cell, ','))
-         {
-            startFloor = atoi(cell.c_str());
-         }
-         else
-         {
-            lineStatus = false;
-         }
+            if (std::getline(lineStream, cell, ','))
+            {
+               startFloor = std::stoi(cell, nullptr);
+            }
+            else
+            {
+               lineStatus = false;
+            }
 
-         if (std::getline(lineStream, cell, ','))
-         {
-            endFloor = atoi(cell.c_str());
+            if (std::getline(lineStream, cell, ','))
+            {
+               endFloor = std::stoi(cell, nullptr);
+            }
+            else
+            {
+               lineStatus = false;
+            }
          }
-         else
+         catch (const std::invalid_argument& e)
          {
             lineStatus = false;
          }
 
          if (lineStatus)
          {
-            // error handling csv input out of scope
-            assert(endFloor != startFloor);
+            // error handling invalid input out of scope
             assert(startTime >= 0);
-            Direction dir = (endFloor - startFloor) > 0 ? Direction::UP : Direction::DOWN;
-
-            PassengerStart newPassenger = std::make_pair(Passenger(dir, endFloor), startFloor);
-            mPassengerList.emplace(startTime, newPassenger);
+            if (endFloor != startFloor)
+            {
+               Direction dir = (endFloor - startFloor) > 0 ? Direction::UP : Direction::DOWN;
+               PassengerStart newPassenger = std::make_pair(Passenger(dir, endFloor), startFloor);
+               mPassengerList.emplace(startTime, newPassenger);
+            }
          }
       }
 

@@ -37,10 +37,9 @@ Elevator::~Elevator()
 bool Elevator::addDestination(const FloorNumber floor)
 {
    assert((floor >= mBottomFloor) && (floor <= mTopFloor));
-   assert((mDirection == Direction::NONE) && (mState != ElevatorState::STOPPED));
    bool status = true;
 
-   if ((floor == mCurrentFloor) && (mState == ElevatorState::STOPPED))
+   if ((mState == ElevatorState::STOPPED) && (mCurrentFloor == floor))
    {
       status = false;
    }
@@ -57,6 +56,7 @@ bool Elevator::addDestination(const FloorNumber floor)
       // update direction, if necessary
       if (mDirection == Direction::NONE)
       {
+         assert(mState == ElevatorState::STOPPED);
          mDirection = mCurrentFloor < floor ? Direction::UP : Direction::DOWN;
       }
 
