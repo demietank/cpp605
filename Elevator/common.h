@@ -11,6 +11,7 @@
 namespace elevators
 {
 
+/// Possible directions of travel.
 enum class Direction
 {
    NONE,
@@ -18,7 +19,8 @@ enum class Direction
    UP
 };
 
-using FloorNumber = unsigned int;
+/// A convenient way to identify floors in a building.
+using FloorNumber = int;
 
 } /* namespace elevators */
 #endif /* COMMON_H_ */

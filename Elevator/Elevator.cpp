@@ -27,21 +27,92 @@ Elevator::Elevator(unsigned int capacity,
       mBottomFloor(bottomFloor),
       mTopFloor(topFloor)
 {
+   assert(mTopFloor > mBottomFloor);
 }
 
 Elevator::~Elevator()
 {
 }
 
-bool Elevator::addPassenger(Passenger passenger)
+bool Elevator::addDestination(const FloorNumber floor)
 {
-   bool status = false;
-   if ((mPassengers.size() < mCapacity) && passenger.getDirection() == mDirection)
+   assert((floor >= mBottomFloor) && (floor <= mTopFloor));
+   assert((mDirection == Direction::NONE) && (mState != ElevatorState::STOPPED));
+   bool status = true;
+
+   if ((floor == mCurrentFloor) && (mState == ElevatorState::STOPPED))
    {
-      mPassengers.emplace_back(passenger);
-      status = true;
+      status = false;
    }
+   else if ((mDirection == Direction::UP) && (mCurrentFloor > floor))
+   {
+      status = false;
+   }
+   else if ((mDirection == Direction::DOWN) && (mCurrentFloor < floor))
+   {
+      status = false;
+   }
+   else
+   {
+      // update direction, if necessary
+      if (mDirection == Direction::NONE)
+      {
+         mDirection = mCurrentFloor < floor ? Direction::UP : Direction::DOWN;
+      }
+
+      // ignore if already in list
+      (void) mDestinations.emplace(floor);
+   }
+
    return status;
+}
+
+bool Elevator::addPassenger(const Passenger& passenger)
+{
+   assert(mState == ElevatorState::STOPPED);
+   bool status = false;
+
+   if (mPassengers.size() < mCapacity)
+   {
+      if (addDestination(passenger.getDestination()))
+      {
+         mPassengers.emplace_back(passenger);
+         status = true;
+      }
+   }
+
+   return status;
+}
+
+std::vector<Passenger> Elevator::disembark()
+{
+   assert(mState == ElevatorState::STOPPED);
+   std::vector<Passenger> retVec;
+   for (auto it = mPassengers.begin(); it != mPassengers.end(); ++it)
+   {
+      if (it->getDestination() == mCurrentFloor)
+      {
+         retVec.emplace_back(*it);
+         mPassengers.erase(it);
+      }
+   }
+
+   mDestinations.erase(mCurrentFloor);
+
+   if (mPassengers.empty())
+   {
+      mDirection = Direction::NONE;
+   }
+
+   return retVec;
+}
+
+void Elevator::incrementPassengerTime()
+{
+   for (auto& passenger : mPassengers)
+   {
+      passenger.incrementTravelTime();
+   }
 }
 
 void Elevator::move()
@@ -72,9 +143,24 @@ void Elevator::move()
       }
       break;
    case ElevatorState::MOVING:
-      if (mTimeInState > mMovingTime)
+      assert(mDirection != Direction::NONE);
+      if (mTimeInState >= mMovingTime)
       {
-         mState = ElevatorState::STOPPING;
+         if (mDestinations.count(mCurrentFloor))
+         {
+            mState = ElevatorState::STOPPING;
+         }
+         else
+         {
+            if (mDirection == Direction::UP)
+            {
+               ++mCurrentFloor;
+            }
+            else if (mDirection == Direction::DOWN)
+            {
+               --mCurrentFloor;
+            }
+         }
          mTimeInState = 0;
       }
       break;
@@ -83,6 +169,7 @@ void Elevator::move()
       assert(false);
    }
    }
+
    assert((mCurrentFloor >= mBottomFloor) && (mCurrentFloor <= mTopFloor));
 }
 

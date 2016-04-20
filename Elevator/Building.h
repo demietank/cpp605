@@ -8,7 +8,7 @@
 #ifndef BUILDING_H_
 #define BUILDING_H_
 
-#include <set>
+#include <map>
 #include <vector>
 
 #include "common.h"
@@ -18,28 +18,47 @@
 namespace elevators
 {
 
+/// A building that contains floors and elevators. This is the hub that contains
+/// the simulation.
 class Building
 {
 public:
-   Building(FloorNumber bottomFloor,
-            FloorNumber topFloor,
-            unsigned int numElevators,
-            Elevator elevator);
+   /// Constructs an empty building consisting of floors and elevators.
+   /// The elevator parameter identifies the qualities common to all elevators.
+   Building(const FloorNumber bottomFloor,
+            const FloorNumber topFloor,
+            const unsigned int numElevators,
+            const Elevator& elevator);
    virtual ~Building();
 
-   void makeFloorRequest(FloorNumber floor,
-                         Direction dir);
+   /// Adds a passenger to a floor.
+   void addPassenger(const Passenger& passenger, const FloorNumber floor);
+
+   /// Adds passengers to elevators stopped on their floor.
+   void addPassengersToElevators();
+
+   /// Identify elevators stopped at floors.
+   /// Removes passengers from all elevators whose destination is the current floor, if any.
+   std::vector<Passenger> disembark();
+
+   /// Increment the travel and wait times for all passengers.
+   void incrementPassengerTime();
+
+   /// Update elevator destination lists.
+   /// For each passenger on each floor, add their current floor to all elevators traveling
+   /// in that direction or stopped. Duplicates are expected.
+   void updateElevatorDestinations();
+
 private:
    /// Floors of the building (contiguous)
    FloorNumber mBottomFloor;
    FloorNumber mTopFloor;
 
-   std::vector<Elevator> mElevators;
-   std::vector<Floor> mFloors;
+   /// Container, keyed by floor number
+   std::map<FloorNumber, Floor> mFloors;
 
-   /// Floors that have requested an elevator going in a direction.
-   std::set<FloorNumber> mFloorRequestsUp;
-   std::set<FloorNumber> mFloorRequestsDown;
+   /// Elevators in the building
+   std::vector<Elevator> mElevators;
 };
 
 } /* namespace elevators */

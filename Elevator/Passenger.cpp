@@ -11,11 +11,11 @@ namespace elevators
 {
 
 Passenger::Passenger(const Direction direction,
-                     const FloorNumber destination) :
-                           mDirection(direction),
-                           mDestination(destination),
-                           mTravelTime(0),
-                           mWaitTime(0)
+                     const FloorNumber destination) noexcept :
+mDirection(direction),
+mDestination(destination),
+mTravelTime(0),
+mWaitTime(0)
 {
 }
 
@@ -23,16 +23,14 @@ Passenger::~Passenger()
 {
 }
 
-void Passenger::moveInTime(const bool traveling)
+void Passenger::incrementTravelTime() noexcept
 {
-   if (traveling)
-   {
-      ++mTravelTime;
-   }
-   else
-   {
-      ++mWaitTime;
-   }
+   ++mTravelTime;
+}
+
+void Passenger::incrementWaitTime() noexcept
+{
+   ++mWaitTime;
 }
 
 } /* namespace elevators */
