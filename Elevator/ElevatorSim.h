@@ -76,7 +76,8 @@ private:
    unsigned int mPassengerWaitTime;
 
    /// List of passengers that will ride the elevator, keyed by their start time
-   std::map<unsigned int, PassengerStart> mPassengerList;
+   /// multiple passengers may have the same start time.
+   std::multimap<unsigned int, PassengerStart> mPassengerList;
 };
 
 } /* namespace elevators */

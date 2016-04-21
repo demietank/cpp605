@@ -131,8 +131,8 @@ bool ElevatorSim::readPassengerCsv()
 void ElevatorSim::moveInTime()
 {
    // add passengers to simulation for every passenger starting at this time
-   auto it = mPassengerList.find(mCurrentTime);
-   if (it != mPassengerList.end())
+   auto range = mPassengerList.equal_range(mCurrentTime);
+   for (auto it = range.first; it != range.second; ++it)
    {
       mBuilding.addPassenger(it->second.first, it->second.second);
    }
