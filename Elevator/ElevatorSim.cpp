@@ -100,12 +100,9 @@ bool ElevatorSim::readPassengerCsv()
          {
             // error handling invalid input out of scope
             assert(startTime >= 0);
-            if (endFloor != startFloor)
-            {
-               Direction dir = (endFloor - startFloor) > 0 ? Direction::UP : Direction::DOWN;
-               PassengerStart newPassenger = std::make_pair(Passenger(dir, endFloor), startFloor);
-               mPassengerList.emplace(startTime, newPassenger);
-            }
+            Direction dir = (endFloor - startFloor) > 0 ? Direction::UP : Direction::DOWN;
+            PassengerStart newPassenger = std::make_pair(Passenger(dir, endFloor), startFloor);
+            mPassengerList.emplace(startTime, newPassenger);
          }
       }
 
@@ -133,14 +130,14 @@ bool ElevatorSim::readPassengerCsv()
 ///    For every passenger on an elevator, increment their travel time.
 void ElevatorSim::moveInTime()
 {
-   // passengers
+   // add passengers to simulation for every passenger starting at this time
    auto it = mPassengerList.find(mCurrentTime);
    if (it != mPassengerList.end())
    {
       mBuilding.addPassenger(it->second.first, it->second.second);
    }
 
-   // elevators
+   // move passengers between floors and elevators
    auto completedPassengers = mBuilding.disembark();
    for (const auto& passenger : completedPassengers)
    {
@@ -151,6 +148,9 @@ void ElevatorSim::moveInTime()
 
    mBuilding.updateElevatorDestinations();
    mBuilding.addPassengersToElevators();
+
+   // move elevators
+   mBuilding.moveElevators();
 
    // time
    ++mCurrentTime;
@@ -164,6 +164,13 @@ void ElevatorSim::runSimulation()
       do
       {
          moveInTime();
+#if 0
+         if (mCurrentTime % 100 == 0)
+         {
+            std::cout << std::endl << "time: " << mCurrentTime << std::endl;
+            std::cout << mBuilding;
+         }
+#endif
          assert(mCurrentTime < 25000); // ensure it doesn't run forever
       } while (mPassengersComplete < mPassengersStart);
    }
@@ -190,9 +197,10 @@ int main()
    std::cout << "sim1: elevator moving time = " << ELEVATOR_MOVING_TIME1 << std::endl;
    sim1.runSimulation();
 
-   //constexpr unsigned int ELEVATOR_MOVING_TIME2 = 5;
-   //ElevatorSim sim2 { PASSENGER_FILE, ELEVATOR_MOVING_TIME1 };
-   //sim2.runSimulation();
+   constexpr unsigned int ELEVATOR_MOVING_TIME2 = 5;
+   ElevatorSim sim2 { PASSENGER_FILE, ELEVATOR_MOVING_TIME2 };
+   std::cout << std::endl << "sim2: elevator moving time = " << ELEVATOR_MOVING_TIME2 << std::endl;
+   sim2.runSimulation();
 
    return 0;
 }

@@ -8,6 +8,8 @@
 #ifndef PASSENGER_H_
 #define PASSENGER_H_
 
+#include <ostream>
+
 #include "common.h"
 
 namespace elevators
@@ -66,7 +68,15 @@ private:
 
    /// Time the passenger has spent waiting for an elevator.
    unsigned int mWaitTime;
+
+   /// Outputs an ASCII representation of the passenger.
+   friend std::ostream& operator<<(std::ostream& out,
+                                   const Passenger& passenger);
 };
+
+/// Outputs an ASCII representation of the passenger.
+std::ostream& operator<<(std::ostream& out,
+                         const Passenger& passenger);
 
 } /* namespace elevators */
 

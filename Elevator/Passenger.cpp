@@ -12,10 +12,10 @@ namespace elevators
 
 Passenger::Passenger(const Direction direction,
                      const FloorNumber destination) noexcept :
-mDirection(direction),
-mDestination(destination),
-mTravelTime(0),
-mWaitTime(0)
+                           mDirection(direction),
+                           mDestination(destination),
+                           mTravelTime(0),
+                           mWaitTime(0)
 {
 }
 
@@ -31,6 +31,13 @@ void Passenger::incrementTravelTime() noexcept
 void Passenger::incrementWaitTime() noexcept
 {
    ++mWaitTime;
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         const Passenger& passenger)
+{
+   out << '|' << passenger.mDestination << '|';
+   return out;
 }
 
 } /* namespace elevators */

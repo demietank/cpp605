@@ -63,6 +63,14 @@ std::vector<Passenger> Building::disembark()
       }
    }
 
+   // catch any passengers who mistakenly got on the elevator
+   for (auto& floor : mFloors)
+   {
+      auto floorVec = floor.second.disembark(floor.first);
+      retVec.insert(retVec.end(), std::make_move_iterator(floorVec.begin()),
+            std::make_move_iterator(floorVec.end()));
+   }
+
    return retVec;
 }
 
@@ -79,18 +87,47 @@ void Building::incrementPassengerTime()
    }
 }
 
+void Building::moveElevators()
+{
+   for (auto& elevator : mElevators)
+   {
+      elevator.move();
+   }
+}
+
 void Building::updateElevatorDestinations()
 {
    for (const auto& floor : mFloors)
    {
-      for (const auto& passenger : floor.second.getPassengers())
+      //if (!floor.second.getPassengers().empty())
+      if (floor.second.hasPassengers())
       {
          for (auto& elevator : mElevators)
          {
-            elevator.addDestination(passenger.getDestination());
+            elevator.addDestination(floor.first);
          }
       }
    }
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         const Building& building)
+{
+   constexpr auto BORDER = "------------------------";
+
+   out << BORDER << std::endl;
+   for (const auto& floor : building.mFloors)
+   {
+      out << floor.first << ": " << floor.second << std::endl;
+   }
+
+   for (const auto& elevator : building.mElevators)
+   {
+      out << elevator << std::endl;
+   }
+   out << BORDER << std::endl;
+
+   return out;
 }
 
 } /* namespace elevators */

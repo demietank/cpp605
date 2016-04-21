@@ -9,6 +9,7 @@
 #define BUILDING_H_
 
 #include <map>
+#include <ostream>
 #include <vector>
 
 #include "common.h"
@@ -32,7 +33,8 @@ public:
    virtual ~Building();
 
    /// Adds a passenger to a floor.
-   void addPassenger(const Passenger& passenger, const FloorNumber floor);
+   void addPassenger(const Passenger& passenger,
+                     const FloorNumber floor);
 
    /// Adds passengers to elevators stopped on their floor.
    void addPassengersToElevators();
@@ -43,6 +45,9 @@ public:
 
    /// Increment the travel and wait times for all passengers.
    void incrementPassengerTime();
+
+   /// Increment the elevators in time.
+   void moveElevators();
 
    /// Update elevator destination lists.
    /// For each passenger on each floor, add their current floor to all elevators traveling
@@ -59,7 +64,15 @@ private:
 
    /// Elevators in the building
    std::vector<Elevator> mElevators;
+
+   /// Outputs an ASCII representation of the building.
+   friend std::ostream& operator<<(std::ostream& out,
+                                   const Building& building);
 };
+
+/// Outputs an ASCII representation of the building.
+std::ostream& operator<<(std::ostream& out,
+                         const Building& building);
 
 } /* namespace elevators */
 

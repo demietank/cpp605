@@ -8,6 +8,7 @@
 #ifndef ELEVATOR_H_
 #define ELEVATOR_H_
 
+#include <ostream>
 #include <set>
 #include <vector>
 
@@ -112,7 +113,15 @@ private:
 
    /// Floors that the elevator will stop on
    std::set<FloorNumber> mDestinations;
+
+   /// Outputs an ASCII representation of the elevator.
+   friend std::ostream& operator<<(std::ostream& out,
+                                   const Elevator& elevator);
 };
+
+/// Outputs an ASCII representation of the elevator.
+std::ostream& operator<<(std::ostream& out,
+                         const Elevator& elevator);
 
 } /* namespace elevators */
 

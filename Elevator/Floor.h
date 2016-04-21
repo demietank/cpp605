@@ -8,6 +8,7 @@
 #ifndef FLOOR_H_
 #define FLOOR_H_
 
+#include <ostream>
 #include <vector>
 
 #include "Elevator.h"
@@ -29,11 +30,11 @@ public:
    /// Adds a passenger to the floor
    void addPassenger(const Passenger& passenger);
 
-   /// Returns a constant reference to the private passenger list.
-   const std::vector<Passenger>& getPassengers() const
-   {
-      return mPassengers;
-   }
+   /// Removes passengers whose destination is the current floor, if any.
+   std::vector<Passenger> disembark(FloorNumber currentFloor);
+
+   /// Returns true if the floor has passengers waiting for transport.
+   bool hasPassengers() const noexcept;
 
    /// Increment wait time for all passengers.
    void incrementPassengerTime() noexcept;
@@ -44,7 +45,15 @@ public:
 private:
    /// Passengers on the floor.
    std::vector<Passenger> mPassengers;
+
+   /// Outputs an ASCII representation of the floor.
+   friend std::ostream& operator<<(std::ostream& out,
+                                   const Floor& floor);
 };
+
+/// Outputs an ASCII representation of the floor.
+std::ostream& operator<<(std::ostream& out,
+                         const Floor& floor);
 
 } /* namespace elevators */
 

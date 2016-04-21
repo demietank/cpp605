@@ -88,18 +88,25 @@ std::vector<Passenger> Elevator::disembark()
 {
    assert(mState == ElevatorState::STOPPED);
    std::vector<Passenger> retVec;
-   for (auto it = mPassengers.begin(); it != mPassengers.end(); ++it)
+
+   // don't increment iterator when erasing, use the returned value
+   auto it = mPassengers.begin();
+   while (it != mPassengers.end())
    {
       if (it->getDestination() == mCurrentFloor)
       {
          retVec.emplace_back(*it);
-         mPassengers.erase(it);
+         it = mPassengers.erase(it);
+      }
+      else
+      {
+         ++it;
       }
    }
 
    mDestinations.erase(mCurrentFloor);
 
-   if (mPassengers.empty())
+   if (mPassengers.empty() && mDestinations.empty())
    {
       mDirection = Direction::NONE;
    }
@@ -121,56 +128,101 @@ void Elevator::move()
 
    switch (mState)
    {
-   case ElevatorState::STOPPED:
-      if (mDirection == Direction::UP)
-      {
-         ++mCurrentFloor;
-         mState = ElevatorState::MOVING;
-         mTimeInState = 0;
-      }
-      else if (mDirection == Direction::DOWN)
-      {
-         --mCurrentFloor;
-         mState = ElevatorState::MOVING;
-         mTimeInState = 0;
-      }
-      break;
-   case ElevatorState::STOPPING:
-      if (mTimeInState >= mStoppingTime)
-      {
-         mState = ElevatorState::STOPPED;
-         mTimeInState = 0;
-      }
-      break;
-   case ElevatorState::MOVING:
-      assert(mDirection != Direction::NONE);
-      if (mTimeInState >= mMovingTime)
-      {
-         if (mDestinations.count(mCurrentFloor))
+      case ElevatorState::STOPPED:
+         if (mDirection == Direction::UP)
          {
-            mState = ElevatorState::STOPPING;
+            ++mCurrentFloor;
+            mState = ElevatorState::MOVING;
+            mTimeInState = 0;
          }
-         else
+         else if (mDirection == Direction::DOWN)
          {
-            if (mDirection == Direction::UP)
-            {
-               ++mCurrentFloor;
-            }
-            else if (mDirection == Direction::DOWN)
-            {
-               --mCurrentFloor;
-            }
+            --mCurrentFloor;
+            mState = ElevatorState::MOVING;
+            mTimeInState = 0;
          }
-         mTimeInState = 0;
+         break;
+      case ElevatorState::STOPPING:
+         if (mTimeInState >= mStoppingTime)
+         {
+            mState = ElevatorState::STOPPED;
+            mTimeInState = 0;
+         }
+         break;
+      case ElevatorState::MOVING:
+         assert(mDirection != Direction::NONE);
+         if (mTimeInState >= mMovingTime)
+         {
+            if (mDestinations.count(mCurrentFloor) > 0)
+            {
+               mState = ElevatorState::STOPPING;
+            }
+            else
+            {
+               if (mDirection == Direction::UP)
+               {
+                  ++mCurrentFloor;
+               }
+               else if (mDirection == Direction::DOWN)
+               {
+                  --mCurrentFloor;
+               }
+            }
+            mTimeInState = 0;
+         }
+         break;
+      default:
+      {
+         assert(false);
       }
-      break;
-   default:
-   {
-      assert(false);
-   }
    }
 
    assert((mCurrentFloor >= mBottomFloor) && (mCurrentFloor <= mTopFloor));
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         const Elevator& elevator)
+{
+   out << elevator.mCurrentFloor << " | ";
+   switch (elevator.mState)
+   {
+      case ElevatorState::STOPPED:
+         out << "STOPPED ";
+         break;
+      case ElevatorState::STOPPING:
+         out << "STOPPING";
+         break;
+      case ElevatorState::MOVING:
+         out << "MOVING  ";
+         break;
+      default:
+      {
+      }
+   }
+   out << " | ";
+   switch (elevator.mDirection)
+   {
+      case Direction::UP:
+         out << "U";
+         break;
+      case Direction::DOWN:
+         out << "D";
+         break;
+      default:
+         out << "-";
+   }
+
+   out << std::endl;
+   for (const auto& destination : elevator.mDestinations)
+   {
+      out << destination << " ";
+   }
+   out << std::endl;
+   for (const auto& passenger : elevator.mPassengers)
+   {
+      out << passenger;
+   }
+   return out;
 }
 
 } /* namespace elevators */
