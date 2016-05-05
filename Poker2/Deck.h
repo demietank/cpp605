@@ -8,8 +8,7 @@
 #ifndef DECK_H_
 #define DECK_H_
 
-#include <vector>
-
+#include "common.h"
 #include "Card.h"
 
 namespace pokergame
@@ -21,11 +20,12 @@ public:
    Deck();
    virtual ~Deck();
 
+   void addCard(const Card card);
    Card getCard();
    void shuffle();
 
 private:
-   std::vector<Card> mDeck;
+   CardCont mDeck;
 };
 
 } /* namespace pokergame */

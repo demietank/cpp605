@@ -5,6 +5,8 @@
  *      Author: cmmay
  */
 
+#include <cassert>
+
 #include "Deck.h"
 
 namespace pokergame
@@ -31,8 +33,14 @@ Deck::~Deck()
 {
 }
 
+void Deck::addCard(const Card card)
+{
+   mDeck.emplace_back(card);
+}
+
 Card Deck::getCard()
 {
+   assert(!mDeck.empty());
    auto card = mDeck.back();
    mDeck.pop_back();
    return card;

@@ -74,7 +74,7 @@ std::ostream& operator<<(std::ostream& out,
       s = " 9";
       break;
    case Rank::TEN:
-      s = "10";
+      s = " 10";
       break;
    case Rank::JACK:
       s = " J";
