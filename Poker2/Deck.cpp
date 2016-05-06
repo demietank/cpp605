@@ -35,7 +35,7 @@ Deck::~Deck()
 
 void Deck::addCard(const Card card)
 {
-   mDeck.emplace_back(card);
+   mDeck.emplace(mDeck.begin(), card);
 }
 
 Card Deck::getCard()
@@ -48,7 +48,17 @@ Card Deck::getCard()
 
 void Deck::shuffle()
 {
+   // credit to: http://codereview.stackexchange.com/questions/39001/fisher-yates-modern-shuffle-algorithm
+   auto currentIndexCounter = mDeck.size();
 
+   for (auto iter = mDeck.rbegin(); iter != mDeck.rend(); iter++, --currentIndexCounter)
+   {
+        int randomIndex = std::rand() % currentIndexCounter;
+        if (*iter != mDeck.at(randomIndex))
+        {
+            std::swap(mDeck.at(randomIndex), *iter);
+        }
+    }
 }
 
 } /* namespace pokergame */

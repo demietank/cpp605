@@ -19,5 +19,15 @@ namespace pokergame
 using Chip = unsigned int;
 using CardCont = std::vector<Card>;
 
+// Moves a player can take when given the action.
+enum class PlayerMove
+{
+   FOLD,    // Fold the hand
+   STAND,   // Take no action
+   CALL,    // Call the raise
+   RAISE    // Raise amount
+};
+
 } /* namespace pokergame */
+
 #endif /* COMMON_H_ */

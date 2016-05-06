@@ -50,7 +50,6 @@ PokerGame::PokerGame(const unsigned int humanPlayers,
 
 PokerGame::~PokerGame()
 {
-   // TODO Auto-generated destructor stub
 }
 
 void PokerGame::runGame()
@@ -61,65 +60,68 @@ void PokerGame::runGame()
    // check if there are at least two players remaining
 }
 
-Chip PokerGame::placeBets(Chip minimumBet)
+PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
+                                          const PlayerCont::iterator begin,
+                                          const PlayerCont::iterator end,
+                                          Chip& pot,
+                                          Chip& potMinimumNew)
 {
-   Chip bets = 0;
-   for (auto& player : mPlayers)
-   {
-      if (player->isActive())
-      {
-         int playerEntry = 0;
-         string msg {"Player: "};
-         msg.append(to_string(player->getId())).append("; fold (-1), call (0), or raise (x) ");
-         bool validEntry = false;
-         while (!validEntry)
-         {
-            getUserInput(msg, playerEntry);
-            if (playerEntry == - 1)
-            {
-               // fold
-               validEntry = true;
-            }
-            else if (playerEntry == 0)
-            {
-               // call
-               validEntry = true;
-            }
-            else if (playerEntry > 0)
-            {
-               // raise
-               if (playerEntry > static_cast<int>(player->getChips()))
-               {
-                  cerr << "insufficient number of chips, please try again" << endl;
-               }
-               else if (playerEntry < static_cast<int>(minimumBet))
-               {
-                  cerr << "minimum bet " << minimumBet <<", please try again" << endl;
-               }
-               else
-               {
-                  validEntry = true;
-               }
-            }
-            else
-            {
-               cerr << "invalid entry, please try again" << endl;
-            }
-         }
+   auto nextAction = begin;
+   potMinimumNew = potMinimum;
 
-         // input sanitized
-         if (playerEntry == -1)
+   do
+   {
+      auto& player = **nextAction;
+      if (player.isActive() && player.inHand())
+      {
+         if ((player.getChips() + player.getChipsInPot()) < potMinimum)
          {
-            player->setInHand(false);
+            // side pots not supported, kick out of hand
+            cerr << "player " << player.getId() << "can't afford to stay in hand, sorry bro" << endl;
+            player.setInHand(false);
          }
-         else if (playerEntry == 0)
+         else
          {
-            bets += minimumBet;
+            Chip raise;
+            auto playerMove = player.makeMove(potMinimum, raise);
+            if (playerMove == PlayerMove::FOLD)
+            {
+               player.setInHand(false);
+            }
+            else if (playerMove == PlayerMove::STAND)
+            {
+               // no action
+            }
+            else if (playerMove == PlayerMove::CALL)
+            {
+               auto playerBet = potMinimum - player.getChipsInPot();
+               player.addChipsToPot(playerBet);
+               pot += playerBet;
+            }
+            else // raise
+            {
+               auto playerBet = potMinimum + raise;
+               player.addChipsToPot(playerBet);
+               pot += playerBet;
+               potMinimumNew += raise;
+
+               // we have a raise, terminate signaled by new pot minimum
+            }
          }
-         bets += playerEntry;
       }
-   }
-   return bets;
+
+      // perform circular iteration, if necessary
+      if (end != mPlayers.end())
+      {
+         nextAction = (nextAction + 1 != mPlayers.end()) ? nextAction + 1 : mPlayers.begin();
+      }
+      else
+      {
+         ++nextAction;
+      }
+   } while((nextAction != end) && (potMinimumNew == potMinimum));
+
+   return nextAction;
 }
 
 void PokerGame::runTurn()
@@ -129,7 +131,7 @@ void PokerGame::runTurn()
    mDeck.shuffle();
 
    // deal each player 5 cards (starting with the player after the button)
-   std::rotate(mPlayers.begin(), mPlayers.begin() + 1, mPlayers.end());
+   rotate(mPlayers.begin(), mPlayers.begin() + 1, mPlayers.end());
    for (auto& player : mPlayers)
    {
       if (player->isActive())
@@ -144,7 +146,7 @@ void PokerGame::runTurn()
    }
    cout << gameState(pot) << endl;
 
-   // place blinds
+   /*********************************** Place Blinds *********************************************/
    // small and big automatic;
    bool smallBlind = true;
    for (auto& player : mPlayers)
@@ -165,18 +167,44 @@ void PokerGame::runTurn()
          }
       }
    }
+
    //ask players to fold/call/raise (starting with player after big blind)
-   std::rotate(mPlayers.begin(), mPlayers.begin() + 2, mPlayers.end());
-   pot += placeBets(mBlind * 2);
+   rotate(mPlayers.begin(), mPlayers.begin() + 2, mPlayers.end());
+   auto potMinimum = mBlind * 2;
+   auto nextBettor = mPlayers.begin();
+   auto finalBettor = mPlayers.end();
+   while(true)
+   {
+      cout << "new player pot minimum: " << potMinimum << endl;
+      nextBettor = placeBets(potMinimum, nextBettor, finalBettor, pot, potMinimum);
+
+      // did someone raise?
+      if (nextBettor != finalBettor)
+      {
+         finalBettor = (nextBettor != mPlayers.begin()) ? nextBettor - 1 : mPlayers.end();
+      }
+      else
+      {
+         break;
+      }
+   };
+
    cout << endl << gameState(pot) << endl;
+   /**********************************************************************************************/
 
-   // betting round #1
+   /*********************************** Betting Round #1 *****************************************/
    // ask players to fold/call/raise (starting with player after the button)
    // display then ask remaining players which cards they wish to discard; draw cards to replace discarded
 
-   // betting round #2
+   //cout << endl << gameState(pot) << endl;
+   /**********************************************************************************************/
+
+   /*********************************** Betting Round #2 *****************************************/
    // ask players to fold/call/raise (starting with player after the button)
    // display then ask remaining players which cards they wish to discard; draw cards to replace discarded
+
+   //cout << endl << gameState(pot) << endl;
+   /**********************************************************************************************/
 
    // showdown
    // player with best hand wins
@@ -184,7 +212,7 @@ void PokerGame::runTurn()
    // return cards to deck
 }
 
-std::string PokerGame::gameState(unsigned int pot) const
+std::string PokerGame::gameState(const unsigned int pot) const
 {
    ostringstream stream;
    stream << "pot: " << to_string(pot) << endl;
@@ -195,67 +223,6 @@ std::string PokerGame::gameState(unsigned int pot) const
    }
 
    return stream.str();
-}
-
-void getUserInput(const std::string& message, int& userInput)
-{
-   // get an input (unsigned int)
-   while (1)
-   {
-      cout << message;
-      string input;
-      getline(cin, input);
-      stringstream inputStream(input);
-      if (inputStream >> userInput)
-      {
-         break;
-      }
-      else
-      {
-         cerr << "invalid number, please try again" << endl;
-      }
-   }
-}
-
-void getUserInput(const std::string& message, unsigned int& userInput)
-{
-   // get an input (unsigned int)
-   while (1)
-   {
-      cout << message;
-      string input;
-      getline(cin, input);
-      stringstream inputStream(input);
-      if (inputStream >> userInput)
-      {
-         break;
-      }
-      else
-      {
-         cerr << "invalid number, please try again" << endl;
-      }
-   }
-}
-
-void getUserInput(const std::string& message, bool& yes)
-{
-   // get an input (string)
-   cout << message << "(y/n) ";
-   string input;
-   getline(cin, input);
-   stringstream inputStream(input);
-   string inputStr;
-   inputStream >> inputStr;
-
-   // did she say yes?
-   if ((inputStr.compare("y") == 0) || (inputStr.compare("yes") == 0))
-   {
-      yes = true;
-   }
-   else
-   {
-      yes = false;
-   }
 }
 
 } /* namespace pokergame */

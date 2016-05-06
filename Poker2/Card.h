@@ -65,6 +65,10 @@ public:
    {
       return (mRank == other.mRank) && (mSuit == other.mSuit);
    };
+   bool operator!=(const Card& other) const
+   {
+      return !(*this == other);
+   };
 
    /// Cards are compared by rank. Suit does not factor into relative ordering.
    bool operator<(const Card& other) const { return mRank < other.mRank; };
