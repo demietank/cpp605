@@ -24,24 +24,26 @@ namespace pokergame
 using std::make_unique;
 using Player_ptr = std::unique_ptr<Player>;
 using PlayerCont = std::vector<Player_ptr>;
+using StartStop = std::pair<PlayerCont::iterator, PlayerCont::iterator>;
 
 // A rudimentary poker game consisting of human and AI players.
 // Blinds are fixed and do not increase. Players who cannot afford a blind are booted.
-// No re-buys
-// All betting numbers are in units of chips and must be greater than big blind.
+// No re-buys.
+// All betting numbers are in units of chips.
 // Human players go in order, then AI players.
 // There are no burn cards
-// There are no ties
+// There are no ties.
 class PokerGame
 {
 public:
+   // Constructs a poker game.
    PokerGame(const unsigned int humanPlayers,
              const unsigned int aiPlayers,
              const Chip blind,
              const Chip buyIn);
    virtual ~PokerGame();
 
-
+   // Run the game until a winner is determined.
    void runGame();
 
 private:
@@ -52,11 +54,10 @@ private:
    // Returns an iterator to the next player to take action. If that equals begin, every player took action.
    // Returns the number of chips added to the pot
    // Returns the new pot pot minimum
-   PlayerCont::iterator placeBets(const Chip potMinimum,
-                                  const PlayerCont::iterator begin,
-                                  const PlayerCont::iterator end,
-                                  Chip& pot,
-                                  Chip& potMinimumNew);
+   StartStop placeBets(const Chip potMinimum,
+                       const StartStop startStop,
+                       Chip& pot,
+                       Chip& potMinimumNew);
 
    // Ask players to fold/call/raise (starting with player after big blind)
    // both inputs are in/out

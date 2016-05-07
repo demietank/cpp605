@@ -51,7 +51,7 @@ public:
    Hand makeHand() const;
 
    // Instruct the player to make a move based on a pot minimum.
-   PlayerMove makeMove(const Chip potMinimum, Chip& raise);
+   virtual PlayerMove makeMove(const Chip potMinimum, Chip& raise) = 0;
 
    // Returns the player's ID.
    unsigned int getId() const
@@ -83,7 +83,7 @@ public:
       return mInHand;
    }
 
-private:
+protected:
    /// Outputs an ASCII representation of the card.
    friend std::ostream& operator<<(std::ostream& out,
                                    const Player& player);

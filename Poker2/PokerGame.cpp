@@ -9,6 +9,8 @@
 #include <cassert>
 #include <sstream>
 
+#include "AIPlayer.h"
+#include "HumanPlayer.h"
 #include "PokerGame.h"
 
 namespace pokergame
@@ -31,11 +33,11 @@ PokerGame::PokerGame(const unsigned int humanPlayers,
    unsigned int id = 1;
    for (unsigned int i = 0; i < humanPlayers; ++i, ++id)
    {
-      mPlayers.emplace_back(make_unique<Player>(id));
+      mPlayers.emplace_back(make_unique<HumanPlayer>(id));
    }
    for (unsigned int i = 0; i < aiPlayers; ++i, ++id)
    {
-      mPlayers.emplace_back(make_unique<Player>(id));
+      mPlayers.emplace_back(make_unique<AIPlayer>(id));
    }
 
    // give them some money and set them as active
@@ -54,24 +56,50 @@ PokerGame::~PokerGame()
 
 void PokerGame::runGame()
 {
-   runTurn();
+   unsigned int playersLeft = mPlayers.size();
+   while (playersLeft >= NUM_PLAYERS_MIN)
+   {
+      runTurn();
 
-   // remove players who cannot afford a big blind
-   // check if there are at least two players remaining
+      // remove players who cannot afford a big blind
+      // check if there are at least two players remaining
+      playersLeft = 0;
+      for (auto& player : mPlayers)
+      {
+         if (player->getChips() < (mBlind * 2))
+         {
+            player->setIsActive(false);
+            cout << "Player: " << player->getId() <<  " eliminated!" << endl;
+         }
+
+         if (player->isActive())
+         {
+            playersLeft++;
+         }
+      }
+   }
+
+   // Output winner
+   for (auto& player : mPlayers)
+   {
+      if (player->isActive())
+      {
+         cout << "Player: " << player->getId() <<  " wins!" << endl;
+      }
+   }
 }
 
-PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
-                                          const PlayerCont::iterator begin,
-                                          const PlayerCont::iterator end,
-                                          Chip& pot,
-                                          Chip& potMinimumNew)
+StartStop PokerGame::placeBets(const Chip potMinimum,
+                               const StartStop startStop,
+                               Chip& pot,
+                               Chip& potMinimumNew)
 {
-   auto nextAction = begin;
+   StartStop nextSS = startStop;
    potMinimumNew = potMinimum;
 
    do
    {
-      auto& player = **nextAction;
+      auto& player = **(nextSS.first);
       if (player.isActive() && player.inHand())
       {
          if ((player.getChips() + player.getChipsInPot()) < potMinimum)
@@ -79,6 +107,7 @@ PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
             // side pots not supported, kick out of hand
             cerr << "player " << player.getId() << "can't afford to stay in hand, sorry bro" << endl;
             player.setInHand(false);
+            player.setIsActive(false);
          }
          else
          {
@@ -106,41 +135,35 @@ PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
                potMinimumNew += raise;
 
                // we have a raise, terminate signaled by new pot minimum
+               nextSS.second = nextSS.first;
             }
          }
       }
 
-      // perform circular iteration, if necessary
-      if (end != mPlayers.end())
+      // perform circular iteration of the next bettor, if necessary
+      ++nextSS.first;
+      if (nextSS.first == mPlayers.end())
       {
-         nextAction = (nextAction + 1 != mPlayers.end()) ? nextAction + 1 : mPlayers.begin();
+         nextSS.first = mPlayers.begin();
       }
-      else
-      {
-         ++nextAction;
-      }
-   } while((nextAction != end) && (potMinimumNew == potMinimum));
+   } while((nextSS.first != startStop.second) && (potMinimumNew == potMinimum));
 
-   return nextAction;
+   return nextSS;
 }
 
 void PokerGame::bettingRound(Chip& pot,
                              Chip& potMinimum)
 {
    //ask players to fold/call/raise
-   auto nextBettor = mPlayers.begin();
-   auto finalBettor = mPlayers.end();
+   // initial round permits all players to bet
+   StartStop startStop {mPlayers.begin(), mPlayers.begin()};
    while(true)
    {
       cout << "player pot minimum: " << potMinimum << endl;
-      nextBettor = placeBets(potMinimum, nextBettor, finalBettor, pot, potMinimum);
+      startStop = placeBets(potMinimum, startStop, pot, potMinimum);
 
       // did someone raise?
-      if (nextBettor != finalBettor)
-      {
-         finalBettor = (nextBettor != mPlayers.begin()) ? nextBettor - 1 : mPlayers.end();
-      }
-      else
+      if (startStop.first == startStop.second)
       {
          break;
       }
