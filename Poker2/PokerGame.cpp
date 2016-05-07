@@ -100,7 +100,7 @@ PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
             }
             else // raise
             {
-               auto playerBet = potMinimum + raise;
+               auto playerBet = potMinimum - player.getChipsInPot() + raise;
                player.addChipsToPot(playerBet);
                pot += playerBet;
                potMinimumNew += raise;
@@ -124,9 +124,72 @@ PlayerCont::iterator PokerGame::placeBets(const Chip potMinimum,
    return nextAction;
 }
 
+void PokerGame::bettingRound(Chip& pot,
+                             Chip& potMinimum)
+{
+   //ask players to fold/call/raise
+   auto nextBettor = mPlayers.begin();
+   auto finalBettor = mPlayers.end();
+   while(true)
+   {
+      cout << "player pot minimum: " << potMinimum << endl;
+      nextBettor = placeBets(potMinimum, nextBettor, finalBettor, pot, potMinimum);
+
+      // did someone raise?
+      if (nextBettor != finalBettor)
+      {
+         finalBettor = (nextBettor != mPlayers.begin()) ? nextBettor - 1 : mPlayers.end();
+      }
+      else
+      {
+         break;
+      }
+   };
+}
+
+PlayerCont::iterator PokerGame::determineWinner()
+{
+   PlayerCont::iterator winner = mPlayers.end();
+
+   // get the first player in the hand
+   for (auto it = mPlayers.begin(); it != mPlayers.end(); ++it)
+   {
+      if ((*it)->isActive() && (*it)->inHand())
+      {
+         winner = it;
+         break;
+      }
+   }
+   auto winningHand = (*winner)->makeHand();
+
+   // check if any other player can beat his hand
+   for (auto it = winner + 1; it != mPlayers.end(); ++it)
+   {
+      if ((*it)->isActive() && (*it)->inHand())
+      {
+         auto playerHand = (*it)->makeHand();
+         auto outcome = winningHand.getWinner(playerHand);
+         if (outcome == HandComparrison::LOSES)
+         {
+            winner = it;
+            winningHand = playerHand;
+         }
+         else if (outcome == HandComparrison::TIES)
+         {
+            cerr << "tie between players " << (*winner)->getId() << " & " << (*it)->getId()
+                  << "! preference given to player " << (*winner)->getId() << endl;
+         }
+      }
+   }
+
+   assert(winner != mPlayers.end());
+   return winner;
+}
+
 void PokerGame::runTurn()
 {
    Chip pot = 0;
+   auto potMinimum = mBlind * 2;
    cout << endl << "dealing new hand" << endl;
    mDeck.shuffle();
 
@@ -138,13 +201,12 @@ void PokerGame::runTurn()
       {
          player->setInHand(true);
          player->clearChipsInPot();
-         for (int i = 0; i < 5; ++i)
+         for (unsigned int i = 0; i < CARDS_PER_HAND; ++i)
          {
             player->addCard(mDeck.getCard());
          }
       }
    }
-   cout << gameState(pot) << endl;
 
    /*********************************** Place Blinds *********************************************/
    // small and big automatic;
@@ -168,48 +230,50 @@ void PokerGame::runTurn()
       }
    }
 
-   //ask players to fold/call/raise (starting with player after big blind)
-   rotate(mPlayers.begin(), mPlayers.begin() + 2, mPlayers.end());
-   auto potMinimum = mBlind * 2;
-   auto nextBettor = mPlayers.begin();
-   auto finalBettor = mPlayers.end();
-   while(true)
-   {
-      cout << "new player pot minimum: " << potMinimum << endl;
-      nextBettor = placeBets(potMinimum, nextBettor, finalBettor, pot, potMinimum);
-
-      // did someone raise?
-      if (nextBettor != finalBettor)
-      {
-         finalBettor = (nextBettor != mPlayers.begin()) ? nextBettor - 1 : mPlayers.end();
-      }
-      else
-      {
-         break;
-      }
-   };
-
    cout << endl << gameState(pot) << endl;
    /**********************************************************************************************/
 
-   /*********************************** Betting Round #1 *****************************************/
-   // ask players to fold/call/raise (starting with player after the button)
-   // display then ask remaining players which cards they wish to discard; draw cards to replace discarded
+   // Betting Round #1
+   cout << "Betting Round #1" << endl;
+   rotate(mPlayers.begin(), mPlayers.begin() + 2, mPlayers.end()); // start after big blind
+   bettingRound(pot, potMinimum);
+   rotate(mPlayers.rbegin(), mPlayers.rbegin() + 2, mPlayers.rend());
+   cout << endl << gameState(pot) << endl;
 
-   //cout << endl << gameState(pot) << endl;
+   /*********************************** Draw #1 **************************************************/
+   // ask remaining players which cards they wish to discard; draw cards to replace discarded
+
    /**********************************************************************************************/
 
-   /*********************************** Betting Round #2 *****************************************/
-   // ask players to fold/call/raise (starting with player after the button)
-   // display then ask remaining players which cards they wish to discard; draw cards to replace discarded
+   // Betting Round #2
+   cout << "Betting Round #2" << endl;
+   bettingRound(pot, potMinimum);
+   cout << endl << gameState(pot) << endl;
 
-   //cout << endl << gameState(pot) << endl;
+   /*********************************** Draw #2 **************************************************/
+   // ask remaining players which cards they wish to discard; draw cards to replace discarded
+
    /**********************************************************************************************/
 
-   // showdown
    // player with best hand wins
+   auto winner = determineWinner();
+   cout << "Player: " << (*winner)->getId() <<  " wins hand!" << endl;
+   (*winner)->addChips(pot);
+   pot = 0;
 
-   // return cards to deck
+   // clean up
+   for (auto& player : mPlayers)
+   {
+      auto discard = player->clearHand();
+      for (auto card : discard)
+      {
+         mDeck.addCard(card);
+      }
+      player->setInHand(false);
+      player->clearChipsInPot();
+   }
+
+   cout << endl << gameState(pot) << endl;
 }
 
 std::string PokerGame::gameState(const unsigned int pot) const

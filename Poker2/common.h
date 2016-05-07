@@ -28,6 +28,8 @@ enum class PlayerMove
    RAISE    // Raise amount
 };
 
+constexpr unsigned int CARDS_PER_HAND = 5;
+
 } /* namespace pokergame */
 
 #endif /* COMMON_H_ */

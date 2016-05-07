@@ -6,6 +6,8 @@
  */
 
 #include <cassert>
+#include <ctime>
+#include <random>
 
 #include "Deck.h"
 
@@ -48,12 +50,16 @@ Card Deck::getCard()
 
 void Deck::shuffle()
 {
+   std::minstd_rand simple_rand;
+   auto seconds = std::time(nullptr);
+   simple_rand.seed(seconds);
+
    // credit to: http://codereview.stackexchange.com/questions/39001/fisher-yates-modern-shuffle-algorithm
    auto currentIndexCounter = mDeck.size();
 
    for (auto iter = mDeck.rbegin(); iter != mDeck.rend(); iter++, --currentIndexCounter)
    {
-        int randomIndex = std::rand() % currentIndexCounter;
+        int randomIndex = simple_rand() % currentIndexCounter;
         if (*iter != mDeck.at(randomIndex))
         {
             std::swap(mDeck.at(randomIndex), *iter);

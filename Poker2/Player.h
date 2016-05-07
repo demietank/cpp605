@@ -13,6 +13,7 @@
 
 #include "common.h"
 #include "Card.h"
+#include "Hand.h"
 
 namespace pokergame
 {
@@ -37,11 +38,17 @@ public:
    // Clear the player's pot commitment.
    void clearChipsInPot();
 
+   // Clear the players hand.
+   CardCont clearHand();
+
    // Set whether the player is active in the game.
    void setIsActive(const bool isActive);
 
    // Set whether the player is in the hand.
    void setInHand(const bool inHand);
+
+   // Makes a Hand used for comparison.
+   Hand makeHand() const;
 
    // Instruct the player to make a move based on a pot minimum.
    PlayerMove makeMove(const Chip potMinimum, Chip& raise);

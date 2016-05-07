@@ -31,6 +31,7 @@ using PlayerCont = std::vector<Player_ptr>;
 // All betting numbers are in units of chips and must be greater than big blind.
 // Human players go in order, then AI players.
 // There are no burn cards
+// There are no ties
 class PokerGame
 {
 public:
@@ -56,6 +57,14 @@ private:
                                   const PlayerCont::iterator end,
                                   Chip& pot,
                                   Chip& potMinimumNew);
+
+   // Ask players to fold/call/raise (starting with player after big blind)
+   // both inputs are in/out
+   void bettingRound(Chip& pot,
+                     Chip& potMinimum);
+
+   // Returns a pointer to the active player in the hand (round) with the best hand (cards).
+   PlayerCont::iterator determineWinner();
 
    // Deals active players cards and lets them play a round of 5 card draw.
    void runTurn();

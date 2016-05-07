@@ -54,6 +54,13 @@ void Player::clearChipsInPot()
    mChipsInPot = 0;
 }
 
+CardCont Player::clearHand()
+{
+   CardCont ret = mHand;
+   mHand.clear();
+   return ret;
+}
+
 void Player::setIsActive(const bool isActive)
 {
    mIsActive = isActive;
@@ -64,11 +71,16 @@ void Player::setInHand(const bool inHand)
    mInHand = inHand;
 }
 
+Hand Player::makeHand() const
+{
+   assert(mHand.size() == CARDS_PER_HAND);
+   return Hand {mHand.at(0), mHand.at(1), mHand.at(2), mHand.at(3), mHand.at(4)};
+}
+
 PlayerMove Player::makeMove(const Chip potMinimum, Chip& raise)
 {
-   string msg {"Player: "};
-   msg.append(to_string(mId)).append("; in pot: ").append(to_string(mChipsInPot)).
-         append("; fold (-1), stand (0), or call/raise (x) ");
+   cout << *this << "| ";
+   string msg {"fold (-1), stand (0), or call/raise (x) "};
 
    PlayerMove move;
    int playerEntry = 0;
@@ -139,9 +151,18 @@ std::ostream& operator<<(std::ostream& out,
    }
    out << (player.mInHand ? "in hand" : "out of hand") << "; ";
    out << "cards: ";
-   for (auto& card : player.mHand)
+
+   // use Hand if possible for sorting
+   if (player.mHand.size() == CARDS_PER_HAND)
    {
-      out << card;
+      out << player.makeHand();
+   }
+   else
+   {
+      for (auto& card : player.mHand)
+      {
+         out << card;
+      }
    }
 
    return out;
