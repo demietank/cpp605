@@ -51,6 +51,19 @@ CardCont HumanPlayer::discardCards()
                discard.emplace_back(card);
             }
          }
+
+         // remove discarded cards from player
+         for (auto cardInDiscard : discard)
+         {
+            for (auto it = mHand.begin(); it != mHand.end(); ++it)
+            {
+               if (*it == cardInDiscard)
+               {
+                  mHand.erase(it);
+                  break;
+               }
+            }
+         }
       }
    }
 
