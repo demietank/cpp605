@@ -47,6 +47,9 @@ public:
    void runGame();
 
 private:
+   // Ask remaining players which cards they wish to discard; draw cards to replace discarded
+   void playerDraw();
+
    // Performs a round of betting, where every active player is given the opportunity to
    // increase their pot contribution to match the current minimum. Players can choose to
    // raise the pot minimum; this results in the function terminating early, indicating the new

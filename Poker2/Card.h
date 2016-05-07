@@ -8,6 +8,7 @@
 #ifndef CARD_H_
 #define CARD_H_
 
+#include <string>
 #include <ostream>
 
 namespace pokergame
@@ -85,6 +86,9 @@ private:
    /// Card suit
    Suit mSuit;
 };
+
+// Parse a string and attempt to create a card from it.
+bool getCardFromStr(const std::string& str, Card& card);
 
 /// Outputs an ASCII representation of the card suit.
 std::ostream& operator<<(std::ostream& out,

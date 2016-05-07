@@ -41,6 +41,9 @@ public:
    // Clear the players hand.
    CardCont clearHand();
 
+   // Select cards to discard
+   virtual CardCont discardCards() = 0;
+
    // Set whether the player is active in the game.
    void setIsActive(const bool isActive);
 
@@ -103,6 +106,7 @@ std::ostream& operator<<(std::ostream& out,
 void getUserInput(const std::string& message, int& userInput);
 void getUserInput(const std::string& message, unsigned int& userInput);
 void getUserInput(const std::string& message, bool& yes);
+void getUserInput(const std::string& message, std::string& inputStr);
 
 } /* namespace pokergame */
 

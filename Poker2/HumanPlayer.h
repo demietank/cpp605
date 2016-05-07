@@ -20,6 +20,9 @@ public:
    HumanPlayer(const unsigned int id);
    virtual ~HumanPlayer();
 
+   // Select cards to discard
+   CardCont discardCards();
+
    // Instruct the player to make a move based on a pot minimum.
    PlayerMove makeMove(const Chip potMinimum, Chip& raise);
 };

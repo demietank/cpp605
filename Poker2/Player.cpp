@@ -170,4 +170,14 @@ void getUserInput(const std::string& message, bool& yes)
    }
 }
 
+void getUserInput(const std::string& message, std::string& inputStr)
+{
+   // get an input (string)
+   cout << message;
+   string input;
+   getline(cin, input);
+   stringstream inputStream(input);
+   inputStream >> inputStr;
+}
+
 } /* namespace pokergame */

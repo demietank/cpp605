@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <sstream>
 
 #include "HumanPlayer.h"
 
@@ -21,6 +22,46 @@ HumanPlayer::HumanPlayer(const unsigned int id) :
 
 HumanPlayer::~HumanPlayer()
 {
+}
+
+CardCont HumanPlayer::discardCards()
+{
+   cout << *this << "| ";
+   string msg {"select cards to discard, separated by commas "};
+
+   CardCont discard;
+   string discardStr;
+   getUserInput(msg, discardStr);
+
+   // Parse input into cards. If the player has that card, remove.
+   stringstream ss(discardStr);
+   string token;
+
+   while(std::getline(ss, token, ','))
+   {
+      Card discardCard {Rank::ACE, Suit::SPADE};
+      bool valid = getCardFromStr(token, discardCard);
+      if (valid)
+      {
+         // check if player has that card
+         for (auto card : mHand)
+         {
+            if (card == discardCard)
+            {
+               discard.emplace_back(card);
+            }
+         }
+      }
+   }
+
+   cout << "discarded: ";
+   for (auto card : discard)
+   {
+      cout << card;
+   }
+   cout << endl;
+
+   return discard;
 }
 
 PlayerMove HumanPlayer::makeMove(const Chip potMinimum, Chip& raise)

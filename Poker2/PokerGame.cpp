@@ -89,6 +89,25 @@ void PokerGame::runGame()
    }
 }
 
+void PokerGame::playerDraw()
+{
+   for (auto& player : mPlayers)
+   {
+      if (player->isActive() && player->inHand())
+      {
+         auto discarded = player->discardCards();
+         if (!discarded.empty())
+         {
+            for (auto card : discarded)
+            {
+               mDeck.addCard(card);
+               player->addCard(mDeck.getCard());
+            }
+         }
+      }
+   }
+}
+
 StartStop PokerGame::placeBets(const Chip potMinimum,
                                const StartStop startStop,
                                Chip& pot,
@@ -263,20 +282,20 @@ void PokerGame::runTurn()
    rotate(mPlayers.rbegin(), mPlayers.rbegin() + 2, mPlayers.rend());
    cout << endl << gameState(pot) << endl;
 
-   /*********************************** Draw #1 **************************************************/
-   // ask remaining players which cards they wish to discard; draw cards to replace discarded
-
-   /**********************************************************************************************/
+   // Draw #1
+   cout << "Draw #1" << endl;
+   playerDraw();
+   cout << endl << gameState(pot) << endl;
 
    // Betting Round #2
    cout << "Betting Round #2" << endl;
    bettingRound(pot, potMinimum);
    cout << endl << gameState(pot) << endl;
 
-   /*********************************** Draw #2 **************************************************/
-   // ask remaining players which cards they wish to discard; draw cards to replace discarded
-
-   /**********************************************************************************************/
+   // Draw #2
+   cout << "Draw #2" << endl;
+   playerDraw();
+   cout << endl << gameState(pot) << endl;
 
    // player with best hand wins
    auto winner = determineWinner();

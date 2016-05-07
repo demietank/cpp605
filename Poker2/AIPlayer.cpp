@@ -19,12 +19,17 @@ AIPlayer::~AIPlayer()
 {
 }
 
+CardCont AIPlayer::discardCards()
+{
+   CardCont discard;
+   return discard;
+}
+
 PlayerMove AIPlayer::makeMove(const Chip potMinimum, Chip& raise)
 {
    (void)raise; // unused
    PlayerMove move = PlayerMove::FOLD;
 
-   // Always attempt to call
    Chip minimumBet = potMinimum - mChipsInPot;
    if (mChips >= minimumBet)
    {

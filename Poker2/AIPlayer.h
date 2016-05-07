@@ -20,6 +20,10 @@ public:
    AIPlayer(const unsigned int id);
    virtual ~AIPlayer();
 
+   // Select cards to discard
+   // The AI player never discards.
+   CardCont discardCards();
+
    // Instruct the player to make a move based on a pot minimum.
    // The AI player always attempts to call.
    PlayerMove makeMove(const Chip potMinimum, Chip& raise);
